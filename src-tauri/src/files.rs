@@ -2,7 +2,7 @@ use arboard::{Clipboard, ImageData};
 use image::io::Reader as ImageReader;
 use std::{borrow::Cow, path::Path};
 
-#[cfg(target_os = "macos")]
+#[cfg(target_os = "linux")]
 pub fn copy_image_to_clipboard(path: &Path) {
     if path.ends_with("png")
         || path.ends_with("jpg")
