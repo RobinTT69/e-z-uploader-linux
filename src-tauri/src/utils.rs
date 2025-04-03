@@ -16,6 +16,7 @@ pub fn get_screenshot_dir() -> PathBuf {
             .unwrap()
             .join("Pictures")
             .join("Screenshots")
+            .join("Pictures/Screenshots")
     } else {
         home::home_dir().unwrap().join("screenshots")
     }
