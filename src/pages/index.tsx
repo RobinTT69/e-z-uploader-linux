@@ -225,7 +225,7 @@ function App() {
                     <li className="group col-span-1 bg-zinc-900 border-[1px] border-zinc-800 shadow-sm shadow-zinc-950 hover:shadow-md hover:shadow-zinc-950 duration-100 w-full rounded-lg">
                       <div>
                         <button
-                          className="absolute z-10 bg-red-700 hover:bg-red-800 p-2 rounded-full m-2 group-hover:opacity-100 opacity-0 duration-100"
+                          className="absolute z-10 bg-red-700 active:scale-90 hover:bg-red-800 p-2 rounded-full m-2 group-hover:opacity-100 opacity-0 duration-100"
                           onClick={async () => {
                             setShowLoadingScreen(true);
                             const client = await getClient();
@@ -290,7 +290,7 @@ function App() {
                     <li className="group col-span-1 bg-zinc-900 border-[1px] border-zinc-800 shadow-sm shadow-zinc-950 hover:shadow-md hover:shadow-zinc-950 duration-100 w-full rounded-lg">
                       <div>
                         <button
-                          className="absolute z-10 bg-red-700 hover:bg-red-800 p-2 rounded-full m-2 group-hover:opacity-100 opacity-0 duration-100"
+                          className="absolute active:scale-90 z-10 bg-red-700 hover:bg-red-800 p-2 rounded-full m-2 group-hover:opacity-100 opacity-0 duration-100"
                           onClick={async () => {
                             setShowLoadingScreen(true);
                             const client = await getClient();
