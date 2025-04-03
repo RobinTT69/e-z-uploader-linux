@@ -22,21 +22,18 @@ fn create_directory() -> Result<(), String> {
 #[tauri::command]
 pub fn get_api_key(app_handle: tauri::AppHandle) -> String {
     let config = crate::config::get_config(&app_handle);
-
     config.api_key
 }
 
 #[tauri::command]
 pub fn is_setup(app_handle: tauri::AppHandle) -> bool {
     let config = crate::config::get_config(&app_handle);
-
     config.setup
 }
 
 #[tauri::command]
 pub fn get_upload_url(app_handle: tauri::AppHandle) -> String {
     let config = crate::config::get_config(&app_handle);
-
     config.upload_url
 }
 
@@ -69,12 +66,15 @@ pub fn set_upload_url(app_handle: tauri::AppHandle, upload_url: String) {
 
     if upload_url_regex.is_match(&upload_url) {
         let mut config = crate::config::get_config(&app_handle);
-
         config.upload_url = upload_url;
-
         crate::config::set_config(&app_handle, config);
     } else if upload_url == "dick" {
-        open(&app_handle.shell_scope(), "https://cdn.discordapp.com/attachments/999709029536374934/1030179201229262868/togif.gif?ex=65c517a5&is=65b2a2a5&hm=d43794a47202c873217eded4965ba6e9e3597ce44798c0c08e97f0621b7f95a7&", None).expect("could not open url");
+        open(
+            &app_handle.shell_scope(),
+            "https://cdn.discordapp.com/attachments/999709029536374934/1030179201229262868/togif.gif?ex=65c517a5&is=65b2a2a5&hm=d43794a47202c873217eded4965ba6e9e3597ce44798c0c08e97f0621b7f95a7&",
+            None,
+        )
+        .expect("could not open url");
     } else {
         let main_window = app_handle.get_window("local").unwrap();
         message(
@@ -88,35 +88,14 @@ pub fn set_upload_url(app_handle: tauri::AppHandle, upload_url: String) {
 #[tauri::command]
 pub fn setup(app_handle: tauri::AppHandle) {
     let mut config = crate::config::get_config(&app_handle);
-    return if config.setup {
+    if config.setup {
         let main_window = app_handle.get_window("local").unwrap();
         message(Some(&main_window), "Uh Oh...", "How did we get there?");
     } else if !config.api_key.is_empty() {
         config.setup = true;
         crate::config::set_config(&app_handle, config);
-        if cfg!(target_os = "macos") {
-            Command::new("sh")
-                .arg("-c")
-                .arg("defaults write com.apple.screencapture location ~/screenshots")
-                .output()
-                .expect("failed to execute process");
-            Command::new("sh")
-                .arg("-c")
-                .arg("defaults write com.apple.screencapture disable-shadow -bool true")
-                .output()
-                .expect("failed to execute process");
-            Command::new("sh")
-                .arg("-c")
-                .arg("defaults write pl.maketheweb.cleanshotx exportPath ~/screenshots")
-                .output()
-                .expect("failed to execute process");
-            Command::new("sh")
-                .arg("-c")
-                .arg("defaults write cc.ffitch.shottr defaultFolder ~/screenshots")
-                .output()
-                .expect("failed to execute process");
-        }
-
+        // Linux-specific setup: remove macOS-specific commands
+        // Create the screenshots directory (modify get_screenshot_dir if needed for Linux)
         let directory_creation_output = create_directory();
         match directory_creation_output {
             Ok(()) => {
@@ -139,25 +118,24 @@ pub fn setup(app_handle: tauri::AppHandle) {
             "Uh Oh...",
             "We're missing your API Key, please provide one.",
         );
-    };
+    }
 }
 
 #[tauri::command]
 pub fn upload_count(app_handle: AppHandle) -> i64 {
     let config = crate::config::get_config(&app_handle);
-
     config.upload_count
 }
 
 #[tauri::command]
 pub fn ss_folder_size(_app_handle: AppHandle) -> u64 {
-    return match home::home_dir() {
+    match home::home_dir() {
         Some(path) if !path.as_os_str().is_empty() => {
             let str_path = get_screenshot_dir();
-            return fs_extra::dir::get_size(str_path).unwrap_or(0);
+            fs_extra::dir::get_size(str_path).unwrap_or(0)
         }
         _ => 0,
-    };
+    }
 }
 
 #[tauri::command]
@@ -172,9 +150,9 @@ pub fn set_auto_wipe(app_handle: AppHandle) -> bool {
 #[tauri::command]
 pub fn auto_wipe_on(app_handle: AppHandle) -> bool {
     let config = crate::config::get_config(&app_handle);
-
     config.auto_wipe
 }
+
 #[tauri::command]
 pub fn select_files_to_upload(app_handle: AppHandle) {
     let path = get_screenshot_dir();
@@ -199,12 +177,25 @@ pub fn select_files_to_upload(app_handle: AppHandle) {
 #[tauri::command]
 pub fn write_to_cb(_app_handle: AppHandle, text: String) {
     let mut clipboard = Clipboard::new().unwrap();
-    clipboard.set_text(text).expect("TODO: panic message");
+    clipboard
+        .set_text(text)
+        .expect("Failed to write to clipboard");
 }
 
 #[tauri::command]
 pub fn delete_file(app_handle: AppHandle, file_path: String, index: i64) {
-    fs::remove_file(file_path).expect("TODO: panic message");
+    // Attempt to remove the file, handling the "not found" case gracefully
+    match fs::remove_file(&file_path) {
+        Ok(_) => {
+            println!("Deleted file: {}", file_path);
+        }
+        Err(ref e) if e.kind() == std::io::ErrorKind::NotFound => {
+            eprintln!("File not found, skipping deletion: {}", file_path);
+        }
+        Err(e) => {
+            panic!("Failed to delete file {}: {:?}", file_path, e);
+        }
+    }
     let path = app_handle
         .path_resolver()
         .app_data_dir()
@@ -215,17 +206,17 @@ pub fn delete_file(app_handle: AppHandle, file_path: String, index: i64) {
             let mut json: Vec<crate::upload::UploadedFile> =
                 serde_json::from_str(cfg.as_str()).unwrap();
             json.remove(index as usize);
-            let s = serde_json::to_string(&json).unwrap().to_string();
+            let s = serde_json::to_string(&json).unwrap();
             File::create(&path)
                 .unwrap()
                 .write_all(s.as_ref())
-                .expect("TODO: panic message");
+                .expect("Failed to write to uploaded_files.json");
         }
         Err(ref e) if e.kind() == std::io::ErrorKind::NotFound => {
             File::create(&path)
                 .unwrap()
                 .write_all(b"[]")
-                .expect("TODO: panic message");
+                .expect("Failed to write to uploaded_files.json");
         }
         Err(err) => {
             sentry::capture_error(&err);
