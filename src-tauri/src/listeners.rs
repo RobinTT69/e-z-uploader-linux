@@ -28,7 +28,7 @@ pub fn watch_file_system(app: tauri::AppHandle) {
                         && files::is_image(&event.paths[0])
                     {
                         last_image = event.paths[0].to_str().unwrap().to_owned();
-                        #[cfg(target_os = "macos")]
+                        #[cfg(target_os = "linux")]
                         files::copy_image_to_clipboard(event.paths[0].as_path());
                         upload::upload_file_to_host(event.paths[0].as_path(), &app);
                     }
