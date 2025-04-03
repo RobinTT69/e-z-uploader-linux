@@ -1,14 +1,7 @@
 # E-Z Uploader
 
-#1 Download our MacOS app from the button below
 
-#2 Drag the app to your applications folder
-
-#3 If you recieve an error when running it for the first time open your termincal and run xattr -d com.apple.quarantine /Applications/E-Z\ Uploader.app
-
-#4 Enter your API key in the API key box and click save. Once its saved click the "Set Up" button. Your API key can be found on the account page
-
-#5 Now screenshot normally with the default screenshot app, and make sure it saves its screenshots in ~/screenshots/
+Make sure your screenshot app (I use flameshot) saves its screenshots in ~/screenshots/
 
 
 ## Reqs
