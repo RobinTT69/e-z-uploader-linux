@@ -8,11 +8,7 @@
 
 #4 Enter your API key in the API key box and click save. Once its saved click the "Set Up" button. Your API key can be found on the account page
 
-#5 Now screenshot normally with the default screenshot app. I recommend using https://shottr.cc/ since it doesn't have a delay. If you plan on using a third-party tool like shottr set the save location to the "screenshots" folder in your home directory
-
-## Download 
-
-https://github.com/imyanice/e-z-uploader/releases/latest
+#5 Now screenshot normally with the default screenshot app, and make sure it saves its screenshots in ~/screenshots/
 
 
 ## Reqs
