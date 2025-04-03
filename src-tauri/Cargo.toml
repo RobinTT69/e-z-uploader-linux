@@ -1,7 +1,7 @@
 [package]
-name = "e-z-uploader"
+name = "e-z-uploader-linux"
 version = "2.0.4"
-description = "E-Z screenshot uploader"
+description = "imyanice's E-Z screenshot uploader - ported to linux!"
 authors = ["imyanice"]
 license = "GPL-v3"
 repository = ""
