@@ -1,7 +1,3 @@
-## Note
-
-### THIS IS STILL IN DEVELOPMENT, YOU WILL ENCOUNTER BUGS. REFER TO THE TROUBLESHOOTING SECTION.
-
 # E-Z Uploader (Linux Port)
 
 <img src="https://i.e-z.host/pics/bigrzavu.png" alt="App Image" />
