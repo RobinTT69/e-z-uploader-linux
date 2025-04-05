@@ -29,9 +29,9 @@ pnpm tauri build
 When you first open the app, it will require some configuration. Go to the settings page and input your API key, click save, and click the button that mentions finishing initialization. You should be good to go.
 
 
-# Troubleshooting
+# Simple Troubleshooting
 
-## The app doesn't seem to be uploading, how come?
+## The app doesn't seem to be responding, how come?
 Common fixed to this which I found effective were to restart the app, turn your wifi on and on, and try logging out and back in.
 
 ## It's not autostarting!
@@ -46,8 +46,9 @@ Exec=INSERT PATH TO FILE
 StartupNotify=true
 Terminal=false
 ```
+#Complex Troubleshooting
 
-## It uploads the image, but doesn't send a notification (and sometimes doesn't even copy the link!)!
+## It fails to upload!
 This can be caused due to one of 3 things:
 1. Your api key is wrong - in which case go to settings and put in the right one
 2. the upload url is wrong - in which case go to settings and reset the url
