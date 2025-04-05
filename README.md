@@ -46,7 +46,7 @@ Exec=INSERT PATH TO FILE
 StartupNotify=true
 Terminal=false
 ```
-#Complex Troubleshooting
+# Complex Troubleshooting
 
 ## It fails to upload!
 This can be caused due to one of 3 things:
