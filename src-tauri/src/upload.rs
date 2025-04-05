@@ -2,6 +2,7 @@ use std::fs;
 use std::fs::File;
 use std::io::Write;
 use std::path::Path;
+use std::io::Cursor;
 
 use crate::files::delete_file;
 use crate::utils;
@@ -15,6 +16,9 @@ use tauri::api::dialog::message;
 use tauri::api::notification::Notification;
 use tauri::regex::Regex;
 use tauri::{AppHandle, Manager};
+
+use image::{self, ImageOutputFormat};
+
 #[allow(dead_code, non_snake_case)]
 #[derive(Deserialize)]
 struct UploadResponse {
@@ -32,11 +36,22 @@ pub(crate) struct UploadedFile {
     pub size: i64,
     pub url: String,
 }
+
 #[allow(dead_code, non_snake_case)]
 #[derive(Deserialize)]
 struct ErrorResponse {
     error: String,
     success: bool,
+}
+
+fn convert_to_png(file: &Path) -> Result<(Vec<u8>, String), Box<dyn std::error::Error>> {
+    // Read the file bytes.
+    let file_bytes = fs::read(file)?;
+    let img = image::load_from_memory(&file_bytes)?;
+    let mut buffer = Vec::new();
+    img.write_to(&mut Cursor::new(&mut buffer), ImageOutputFormat::Png)?;
+    let new_filename = format!("{}.png", file.file_stem().unwrap().to_string_lossy());
+    Ok((buffer, new_filename))
 }
 
 pub fn upload_file_to_host(file: &Path, app_handle: &tauri::AppHandle) {
@@ -52,65 +67,64 @@ pub fn upload_file_to_host(file: &Path, app_handle: &tauri::AppHandle) {
         );
         return;
     }
-    // sentry::capture_message(file.to_str().unwrap(), Level::Info);
 
-    match Part::file(file) {
-        Ok(part_file) => {
-            let client = Client::builder()
-                .user_agent("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36")
-                .build()
-                .expect("failed to build client");
-            let request = client
-                .post(config.upload_url)
-                .header("key", config.api_key)
-                .multipart(Form::new().part("file", part_file))
-                .send();
-            // sentry::capture_message("Request has been sent", Level::Info);
+    let (png_bytes, png_filename) = match convert_to_png(file) {
+        Ok(result) => result,
+        Err(err) => {
+            display_error_message(app_handle);
+            return;
+        }
+    };
 
-            match request {
-                Ok(data) => {
-                    // sentry::capture_message("The data is ok", Level::Info);
+    let part = Part::bytes(png_bytes).file_name(png_filename);
 
-                    match data.status() {
-                        reqwest::StatusCode::OK => {
-                            let response = data
-                                .json::<UploadResponse>()
-                                .expect("Could not parse upload response");
-                            let mut clipboard = Clipboard::new().unwrap();
-                            let url = response.imageUrl.clone();
-                            match clipboard.set_text(response.imageUrl) {
-                                Ok { .. } => {
-                                    if !config.auto_wipe {
-                                        add_file_data(app_handle, file, response.deletionUrl, url)
-                                    };
-                                    utils::add_int_to_uploaded_files(app_handle);
-                                    display_successful_notification(app_handle);
-                                }
-                                Err(err) => {
-                                    display_error_message(app_handle);
-                                    sentry::capture_error(&err);
-                                }
+    let client = Client::builder()
+        .user_agent("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36")
+        .build()
+        .expect("failed to build client");
+
+    let request = client
+        .post(config.upload_url)
+        .header("key", config.api_key)
+        .multipart(Form::new().part("file", part))
+        .send();
+
+    match request {
+        Ok(response) => {
+            match response.status() {
+                reqwest::StatusCode::OK => {
+                    let upload_response = response
+                        .json::<UploadResponse>()
+                        .expect("Could not parse upload response");
+                    let mut clipboard = Clipboard::new().unwrap();
+                    let url = upload_response.imageUrl.clone();
+                    match clipboard.set_text(upload_response.imageUrl) {
+                        Ok { .. } => {
+                            if !config.auto_wipe {
+                                add_file_data(app_handle, file, upload_response.deletionUrl, url)
                             };
+                            utils::add_int_to_uploaded_files(app_handle);
+                            display_successful_notification(app_handle);
                         }
-                        reqwest::StatusCode::UNAUTHORIZED => {
+                        Err(err) => {
                             display_error_message(app_handle);
-                            println!("Invalid API Key")
+                            sentry::capture_error(&err);
                         }
-                        _ => {
-                            display_error_message(app_handle);
-                            panic!("An invalid status code has been given");
-                        }
-                    }
+                    };
                 }
-                Err(err) => {
-                    sentry::capture_error(&err);
-                    display_no_internet_notification(app_handle);
+                reqwest::StatusCode::UNAUTHORIZED => {
+                    display_error_message(app_handle);
+                    println!("Invalid API Key")
+                }
+                _ => {
+                    display_error_message(app_handle);
+                    println!("An invalid status code has been given");
                 }
             }
         }
-        Err(_) => {
-            // sentry::capture_message("A file did not exist", Level::Info);
-            println!("file doesnt exist")
+        Err(err) => {
+            sentry::capture_error(&err);
+            display_no_internet_notification(app_handle);
         }
     }
 
@@ -138,10 +152,11 @@ fn display_no_internet_notification(app_handle: &AppHandle) {
 fn display_error_message(app_handle: &tauri::AppHandle) {
     Notification::new(app_handle.config().tauri.bundle.identifier.clone())
         .title("Could not upload to E-Z.host!")
-        .body("An error occurred while uploading your file.")
+        .body(" occurAn errorred while uploading your file.")
         .show()
         .expect("error while showing notification");
 }
+
 fn add_file_data(app_handle: &AppHandle, file_path: &Path, deletion_url: String, url: String) {
     let path = app_handle
         .path_resolver()
@@ -153,39 +168,39 @@ fn add_file_data(app_handle: &AppHandle, file_path: &Path, deletion_url: String,
             Ok(file_meta) => {
                 let mut json: Vec<UploadedFile> = serde_json::from_str(cfg.as_str()).unwrap();
                 json.push(UploadedFile {
-                    path: file_path.as_os_str().to_str().unwrap().to_string(),
+                    path: file_path.to_string_lossy().to_string(),
                     deletion_url,
-                    name: file_path.file_name().unwrap().to_str().unwrap().to_string(),
+                    name: file_path.file_name().unwrap().to_string_lossy().to_string(),
                     size: file_meta.len() as i64,
                     url,
                 });
-                let s = serde_json::to_string(&json).unwrap().to_string();
+                let s = serde_json::to_string(&json).unwrap();
                 File::create(&path)
                     .unwrap()
                     .write_all(s.as_ref())
-                    .expect("TODO: panic message");
+                    .expect("Error writing file data");
             }
             Err(_) => {
                 let mut json: Vec<UploadedFile> = serde_json::from_str(cfg.as_str()).unwrap();
                 json.push(UploadedFile {
-                    path: file_path.as_os_str().to_str().unwrap().to_string(),
+                    path: file_path.to_string_lossy().to_string(),
                     deletion_url,
-                    name: file_path.file_name().unwrap().to_str().unwrap().to_string(),
+                    name: file_path.file_name().unwrap().to_string_lossy().to_string(),
                     size: 0i64,
                     url,
                 });
-                let s = serde_json::to_string(&json).unwrap().to_string();
+                let s = serde_json::to_string(&json).unwrap();
                 File::create(&path)
                     .unwrap()
                     .write_all(s.as_ref())
-                    .expect("TODO: panic message");
+                    .expect("Error writing file data");
             }
         },
         Err(ref e) if e.kind() == std::io::ErrorKind::NotFound => {
             File::create(&path)
                 .unwrap()
                 .write_all(b"[]")
-                .expect("TODO: panic message");
+                .expect("Error initializing file data");
         }
         Err(err) => {
             sentry::capture_error(&err);
