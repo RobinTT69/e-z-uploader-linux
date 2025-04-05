@@ -47,7 +47,7 @@ StartupNotify=true
 Terminal=false
 ```
 
-##It doesn't send a notification!
+## It doesn't send a notification!
 Cause TBD - open a PR if you know.
 
 # oliver
