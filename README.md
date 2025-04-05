@@ -1,9 +1,19 @@
 # E-Z Uploader (Linux Port)
 
-# THIS IS STILL IN DEVELOPMENT, YOU WILL ENCOUNTER BUGS. REFER TO THE TROUBLESHOOTING SECTION.
+<img src="https://i.e-z.host/pics/bigrzavu.png" alt="App Image" />
+<p>Screenshot taken by Flameshot, uploaded by E-Z Uploader on Arch Linux</p>
 
-Make sure your screenshot app (I use flameshot) saves its screenshots in ~/screenshots/
+# Notes
 
+### THIS IS STILL IN DEVELOPMENT, YOU WILL ENCOUNTER BUGS. REFER TO THE TROUBLESHOOTING SECTION.
+
+### Make sure your screenshot app (I use Flameshot) saves its screenshots in ~/screenshots/ or /Pictures/
+
+# Setup
+When you first open the app, it will require some configuration. Go to the settings page and input your API key, click save, and click the button that mentions finishing initialization. You should be good to go.
+
+
+# Develop
 
 ## Reqs
 
@@ -24,10 +34,6 @@ pnpm tauri dev
 pnpm install
 pnpm tauri build
 ```
-
-# Setup
-When you first open the app, it will require some configuration. Go to the settings page and input your API key, click save, and click the button that mentions finishing initialization. You should be good to go.
-
 
 # Simple Troubleshooting
 
