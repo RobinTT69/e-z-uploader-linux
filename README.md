@@ -1,16 +1,23 @@
-# E-Z Uploader (Linux Port)
-
-<img src="https://i.e-z.host/pics/bigrzavu.png" alt="App Image" />
-<p>Screenshot taken by Flameshot, uploaded by E-Z Uploader on Arch Linux</p>
-
-# Notes
+## Note
 
 ### THIS IS STILL IN DEVELOPMENT, YOU WILL ENCOUNTER BUGS. REFER TO THE TROUBLESHOOTING SECTION.
 
-### Make sure your screenshot app (I use Flameshot) saves its screenshots in ~/screenshots/ or /Pictures/
+# E-Z Uploader (Linux Port)
+
+<img src="https://i.e-z.host/pics/bigrzavu.png" alt="App Image" />
+<p>Screenshot taken by Flameshot, uploaded by E-Z Uploader on Arch Linux"</p>
+
+# Why use this?
+By using this uploader, you get the option to use ANY screenshot tool on ANY DE, or Wm alike, due to the nature of the app. Additionally, you can upload images and videos with ease, without having to open a browser, as well as being able to delete, and copy links to your last 3 taken screenshots.
 
 # Setup
 When you first open the app, it will require some configuration. Go to the settings page and input your API key, click save, and click the button that mentions finishing initialization. You should be good to go.
+
+### Make sure your screenshot app (I use Flameshot) saves its screenshots in ~/screenshots/ or /Pictures/
+
+
+# Usage
+Take a screenshot with your preferred app. If placed in the directories listed above, it should automatically uplaod them, and copy the url (sending a notification to let you know).
 
 
 # Develop
