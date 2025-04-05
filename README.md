@@ -47,8 +47,8 @@ StartupNotify=true
 Terminal=false
 ```
 
-## It uploads the image, but doesn't send a notification!
-Cause TBD - open a PR if you know.
+## It uploads the image, but doesn't send a notification (and sometimes doesn't even copy the link!)!
+Cause TBD - open a PR if you know. This error is very circumstancial, and sometimes right after occouring, it fixes itself. YMMV
 
 # oliver
 ![Logo](https://r2.e-z.host/2082d908-7c65-4fc3-b02a-5f50f9141543/lbo1x6wn.png)
