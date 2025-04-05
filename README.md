@@ -48,7 +48,20 @@ Terminal=false
 ```
 
 ## It uploads the image, but doesn't send a notification (and sometimes doesn't even copy the link!)!
-Cause TBD - open a PR if you know. This error is very circumstancial, and sometimes right after occouring, it fixes itself. YMMV
+This can be caused due to one of 3 things:
+1. Your api key is wrong - in which case go to settings and put in the right one
+2. the upload url is wrong - in which case go to settings and reset the url
+3. The application attempts to upload the image before it has finished writing to disk, resulting in 400 and 422 error codes. In which case:
+
+a. **Clone the Repository and Install Dependencies**: Clone the repository and ensure all dependencies are installed.
+
+b. **Modify the Delay in the Code**:
+   - Navigate to `src-tauri/src/listeners.rs`.
+   - Locate the line immediately following the comment regarding the delay.
+   - Increase the delay from 700ms to a higher value.
+
+c. **Rebuild the Application**: After making the changes, rebuild the application to apply the updates.
+
 
 # oliver
 ![Logo](https://r2.e-z.host/2082d908-7c65-4fc3-b02a-5f50f9141543/lbo1x6wn.png)
