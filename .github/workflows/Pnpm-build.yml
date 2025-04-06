@@ -17,13 +17,20 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '21'
+          node-version: '16'
           cache: 'pnpm'
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v2
         with:
-          version: '10.7.1'  
+          version: '8'  # Specify the desired pnpm version
+
+      - name: Debug pnpm installation
+        run: |
+          echo "pnpm location:"
+          which pnpm
+          echo "pnpm version:"
+          pnpm --version
 
       - name: Install dependencies
         run: pnpm install
