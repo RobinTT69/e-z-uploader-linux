@@ -1,7 +1,7 @@
 # E-Z Uploader (Linux Port)
 
-<img src="https://i.e-z.host/pics/bigrzavu.png" alt="App Image" />
-<p>Screenshot taken by Flameshot, uploaded by E-Z Uploader on Arch Linux"</p>
+<img src="https://e-z.tools/pics/scu1tc15.png" alt="App Image" />
+<p>Screenshot taken by Flameshot, uploaded by E-Z Uploader on Arch Linux (Hyprland)"</p>
 
 # Why use this?
 By using this uploader, you get the option to use ANY screenshot tool on ANY DE, or Wm alike, due to the nature of the app. Additionally, you can upload images and videos with ease, without having to open a browser, as well as being able to delete, and copy links to your last 3 taken screenshots.
