@@ -9,9 +9,9 @@ By using this uploader, you get the option to use ANY screenshot tool on ANY DE,
 # Setup
 Download the executable from releases, download the wayland version if you are on wayland.
 
-Then double click on the file, and if it won't let you, cd into your downloads directory and do ``` chmod +x FILE_NAME``` and then double click. it should minimize to dock by default. to open the main app, right click and open.
+Then double click on the file, and if it won't let you, cd into your downloads directory and do ``` chmod +x FILE_NAME``` and then double click.
 
-When you first open the app, it will require some configuration. Go to the settings page and input your API key, click save, and click the button that mentions finishing initialization. You should be good to go.
+## When you first open the app, it will require some configuration. Go to the settings page and input your API key, click save, and click the button that mentions finishing initialization. You should be good to go.
 
 ### Make sure your screenshot app (I use Flameshot) saves its screenshots in ~/screenshots/ or /Pictures/
 
