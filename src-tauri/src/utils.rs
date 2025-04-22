@@ -1,4 +1,5 @@
 use crate::config;
+use std::fs;
 use std::path::PathBuf;
 use tauri::AppHandle;
 
@@ -11,13 +12,20 @@ pub fn add_int_to_uploaded_files(app_handle: &AppHandle) {
 }
 
 pub fn get_screenshot_dir() -> PathBuf {
-    if cfg!(windows) {
+    let path = if cfg!(windows) {
         home::home_dir()
-            .unwrap()
+            .expect("Failed to get home directory")
             .join("Pictures")
             .join("Screenshots")
-            .join("Pictures/screenshots")
     } else {
-        home::home_dir().unwrap().join("screenshots")
+        home::home_dir()
+            .expect("Failed to get home directory")
+            .join("screenshots")
+    };
+
+    if !path.exists() {
+        fs::create_dir_all(&path).expect("Failed to create screenshot directory");
     }
+
+    path
 }
