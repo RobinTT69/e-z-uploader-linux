@@ -1,8 +1,8 @@
 use std::fs;
 use std::fs::File;
+use std::io::Cursor;
 use std::io::Write;
 use std::path::Path;
-use std::io::Cursor;
 
 use crate::files::delete_file;
 use crate::utils;
@@ -45,7 +45,6 @@ struct ErrorResponse {
 }
 
 fn convert_to_png(file: &Path) -> Result<(Vec<u8>, String), Box<dyn std::error::Error>> {
-    // Read the file bytes.
     let file_bytes = fs::read(file)?;
     let img = image::load_from_memory(&file_bytes)?;
     let mut buffer = Vec::new();
@@ -72,6 +71,7 @@ pub fn upload_file_to_host(file: &Path, app_handle: &tauri::AppHandle) {
         Ok(result) => result,
         Err(err) => {
             display_error_message(app_handle);
+            println!("Error converting file to PNG: {}", err);
             return;
         }
     };
@@ -90,40 +90,38 @@ pub fn upload_file_to_host(file: &Path, app_handle: &tauri::AppHandle) {
         .send();
 
     match request {
-        Ok(response) => {
-            match response.status() {
-                reqwest::StatusCode::OK => {
-                    let upload_response = response
-                        .json::<UploadResponse>()
-                        .expect("Could not parse upload response");
-                    let mut clipboard = Clipboard::new().unwrap();
-                    let url = upload_response.imageUrl.clone();
-                    match clipboard.set_text(upload_response.imageUrl) {
-                        Ok { .. } => {
-                            if !config.auto_wipe {
-                                add_file_data(app_handle, file, upload_response.deletionUrl, url)
-                            };
-                            utils::add_int_to_uploaded_files(app_handle);
-                            display_successful_notification(app_handle);
-                        }
-                        Err(err) => {
-                            display_error_message(app_handle);
-                            sentry::capture_error(&err);
-                        }
-                    };
-                }
-                reqwest::StatusCode::UNAUTHORIZED => {
-                    display_error_message(app_handle);
-                    println!("Invalid API Key")
-                }
-                _ => {
-                    display_error_message(app_handle);
-                    println!("An invalid status code has been given");
-                }
+        Ok(response) => match response.status() {
+            reqwest::StatusCode::OK => {
+                let upload_response = response
+                    .json::<UploadResponse>()
+                    .expect("Could not parse upload response");
+                let mut clipboard = Clipboard::new().unwrap();
+                let url = upload_response.imageUrl.clone();
+                match clipboard.set_text(upload_response.imageUrl) {
+                    Ok { .. } => {
+                        if !config.auto_wipe {
+                            add_file_data(app_handle, file, upload_response.deletionUrl, url)
+                        };
+                        utils::add_int_to_uploaded_files(app_handle);
+                        display_successful_notification(app_handle);
+                    }
+                    Err(err) => {
+                        display_error_message(app_handle);
+                        eprintln!("Error setting clipboard text: {:?}", err);
+                    }
+                };
             }
-        }
+            reqwest::StatusCode::UNAUTHORIZED => {
+                display_error_message(app_handle);
+                println!("Invalid API Key")
+            }
+            _ => {
+                display_error_message(app_handle);
+                println!("An invalid status code has been given");
+            }
+        },
         Err(err) => {
-            sentry::capture_error(&err);
+            eprintln!("Error sending request: {:?}", err);
             display_no_internet_notification(app_handle);
         }
     }
@@ -203,7 +201,7 @@ fn add_file_data(app_handle: &AppHandle, file_path: &Path, deletion_url: String,
                 .expect("Error initializing file data");
         }
         Err(err) => {
-            sentry::capture_error(&err);
+            eprintln!("Error reading uploaded_files.json: {:?}", err);
         }
     }
 }
