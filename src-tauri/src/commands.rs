@@ -4,7 +4,7 @@ use reqwest::header::USER_AGENT;
 use std::fs::File;
 use std::io::Write;
 use std::string::String;
-use std::{fs, process::Command, thread, time};
+use std::{fs, thread, time};
 use tauri::api::dialog::{message, FileDialogBuilder};
 use tauri::api::process::restart;
 use tauri::api::shell::open;

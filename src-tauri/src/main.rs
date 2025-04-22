@@ -18,13 +18,16 @@ use tauri::{CustomMenuItem, Manager, SystemTray, SystemTrayEvent, SystemTrayMenu
 use tauri_plugin_autostart::MacosLauncher;
 
 fn main() {
-    let _guard = sentry::init(("", sentry::ClientOptions {
-        release: Some("me.yanice.e-z-uploader@2.0.2".into()),
-        environment: Some("production".into()),
-        ..Default::default()
-    }));
+    let _guard = sentry::init((
+        "",
+        sentry::ClientOptions {
+            release: Some("me.yanice.e-z-uploader@2.0.2".into()),
+            environment: Some("production".into()),
+            ..Default::default()
+        },
+    ));
 
-    let mut app = tauri::Builder::default()
+    let app = tauri::Builder::default()
         .plugin(tauri_plugin_autostart::init(
             MacosLauncher::LaunchAgent,
             None,
