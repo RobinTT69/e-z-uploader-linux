@@ -45,7 +45,6 @@ struct ErrorResponse {
 }
 
 fn convert_to_png(file: &Path) -> Result<(Vec<u8>, String), Box<dyn std::error::Error>> {
-    // Read the file bytes.
     let file_bytes = fs::read(file)?;
     let img = image::load_from_memory(&file_bytes)?;
     let mut buffer = Vec::new();
@@ -108,7 +107,7 @@ pub fn upload_file_to_host(file: &Path, app_handle: &tauri::AppHandle) {
                     }
                     Err(err) => {
                         display_error_message(app_handle);
-                        sentry::capture_error(&err);
+                        eprintln!("Error setting clipboard text: {:?}", err);
                     }
                 };
             }
@@ -122,7 +121,7 @@ pub fn upload_file_to_host(file: &Path, app_handle: &tauri::AppHandle) {
             }
         },
         Err(err) => {
-            sentry::capture_error(&err);
+            eprintln!("Error sending request: {:?}", err);
             display_no_internet_notification(app_handle);
         }
     }
@@ -202,7 +201,7 @@ fn add_file_data(app_handle: &AppHandle, file_path: &Path, deletion_url: String,
                 .expect("Error initializing file data");
         }
         Err(err) => {
-            sentry::capture_error(&err);
+            eprintln!("Error reading uploaded_files.json: {:?}", err);
         }
     }
 }

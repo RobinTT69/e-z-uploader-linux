@@ -10,23 +10,11 @@ mod listeners;
 mod upload;
 mod utils;
 
-use crate::utils::get_screenshot_dir;
-use sentry::User;
 use std::thread;
-use tauri::regex::Regex;
 use tauri::{CustomMenuItem, Manager, SystemTray, SystemTrayEvent, SystemTrayMenu};
 use tauri_plugin_autostart::MacosLauncher;
 
 fn main() {
-    let _guard = sentry::init((
-        "",
-        sentry::ClientOptions {
-            release: Some("me.yanice.e-z-uploader@2.0.2".into()),
-            environment: Some("production".into()),
-            ..Default::default()
-        },
-    ));
-
     let app = tauri::Builder::default()
         .plugin(tauri_plugin_autostart::init(
             MacosLauncher::LaunchAgent,
@@ -55,31 +43,6 @@ fn main() {
 
     let app_handle = app.handle();
     let base_config = config::get_config(&app_handle);
-
-    let user;
-    if base_config.api_key.is_empty() {
-        user = Some(User {
-            username: Some(get_screenshot_dir().to_str().unwrap().into()),
-            ..Default::default()
-        });
-    } else {
-        let re = Regex::new(r"^[^_]+").unwrap();
-
-        if let Some(mat) = re.find(base_config.api_key.as_str()) {
-            user = Some(User {
-                username: Some(mat.as_str().into()),
-                ..Default::default()
-            });
-        } else {
-            user = Some(User {
-                username: Some(get_screenshot_dir().to_str().unwrap().into()),
-                ..Default::default()
-            });
-        }
-    }
-    sentry::configure_scope(|scope| {
-        scope.set_user(user.clone());
-    });
 
     if base_config.upload_url.is_empty() {
         let mut config_with_upload_url = config::get_config(&app_handle);

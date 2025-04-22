@@ -184,7 +184,6 @@ pub fn write_to_cb(_app_handle: AppHandle, text: String) {
 
 #[tauri::command]
 pub fn delete_file(app_handle: AppHandle, file_path: String, index: i64) {
-    // Attempt to remove the file, handling the "not found" case gracefully
     match fs::remove_file(&file_path) {
         Ok(_) => {
             println!("Deleted file: {}", file_path);
@@ -219,7 +218,7 @@ pub fn delete_file(app_handle: AppHandle, file_path: String, index: i64) {
                 .expect("Failed to write to uploaded_files.json");
         }
         Err(err) => {
-            sentry::capture_error(&err);
+            eprintln!("Error reading uploaded_files.json: {:?}", err);
         }
     }
 }

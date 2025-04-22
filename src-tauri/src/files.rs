@@ -24,7 +24,7 @@ pub fn copy_image_to_clipboard(path: &Path) {
         match clipboard.set_image(img_data) {
             Ok(_) => (),
             Err(e) => {
-                sentry::capture_error(&e);
+                eprintln!("Failed to copy image to clipboard: {:?}", e);
             }
         }
     }
